@@ -15,7 +15,7 @@ MYSQL_PORT=3306
 MYSQL_ROOT_PASSWORD="jordan2006"
 
 echo "1. Creates a mySQL container after downloading the image"
-docker run --name=$MYSQL_CONTAINER -d -p $MYSQL_PORT:3306 -t -e MYSQL_DATABASE='cellsites' -e MYSQL_USER='user' -e MYSQL_PASSWORD='jordan2006' mysql/mysql-server
+docker run --name=$MYSQL_CONTAINER -d -p $MYSQL_PORT:3306 -t -e MYSQL_DATABASE='security' -e MYSQL_USER='user' -e MYSQL_PASSWORD='jordan2006' mysql/mysql-server
 
 echo "2. Waits for the $MYSQL_CONTAINER container be up and running"
 
