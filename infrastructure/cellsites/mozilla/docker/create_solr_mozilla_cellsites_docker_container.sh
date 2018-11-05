@@ -61,5 +61,15 @@ docker cp ./../import_data/sample.csv $SOLR_CONTAINER:/opt/solr/
 echo "Load into $SOLR_CORE sample data"
 docker exec -it --user=solr $SOLR_CONTAINER bin/post -c $SOLR_CORE sample.csv
 
-RESPONSE=$(curl http://localhost:$SOLR_PORT/solr/$SOLR_CORE/select?q=*:*&rows=0&wt=xml)
+RESPONSE=$(curl "http://localhost:$SOLR_PORT/solr/$SOLR_CORE/select?q=*:*&rows=0" | grep 24373)
 echo "Check solr reponse to data query: $RESPONSE"
+
+
+if [[ -n "${RESPONSE/[ ]*\n/}" ]]
+then
+  echo "The script terminated with success!"
+  exit 0
+else
+  echo "The script failed. Incorrect number of solr documents found"
+  exit 1  
+fi
