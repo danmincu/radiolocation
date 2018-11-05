@@ -1,0 +1,96 @@
+ 
+ HOST https://docs.docker.com/install/linux/docker-ce/centos/#upgrade-docker-ce
+   - install docker https://docs.docker.com/install/linux/docker-ce/centos/#upgrade-docker-ce
+   - start docker | TODO - make it automatically   
+      systemctl start docker
+ 
+   - start the container 
+      docker start cs_solr
+ 
+ 
+ CONTAINER PROVISIONING - https://hub.docker.com/_/solr/
+   - create the core
+     docker exec -it --user=solr cs_solr bin/solr create_core -c cellsites
+     Option: (no autofields)
+	 docker exec -it --user=solr cs_solr bin/solr config -c cellsites -p 8983 -action set-user-property -property update.autoCreateFields -value false
+	 // curl http://hostname:8983/solr/collection/config -d '{"set-user-property": {"update.autoCreateFields":"false"}}'
+	 
+	 
+retrieving the config
+
+curl http://127.0.1.1:8983/solr/cellsites/config -v 
+
+
+
+
+1) - push a schema (auto for prototyping) and the one user manipulated for production
+
+2) copy the CSV file from the host to the docker image to be ingested
+
+     docker cp $HOME/mydata/sites.csv cellsites:/opt/solr/sites.csv
+
+3) the command to ingest the data from the CSV
+
+4) use the MCC/MNC/AREA/UNIT to create a unique key so we can override? or we should never override and just deal with the duplicates?!
+
+
+
+https://stackoverflow.com/questions/53039033/importing-latitude-and-longitude-into-a-locationlatlonpointspatialfield-class/53058209#53058209
+
+
+ust conclude and aggregate the answer for anyone interested this is the solution I came to following MatsLindh suggestion. Context: CentOS 7 and Solr 7.5
+
+Sample.csv content
+name,lon,lat,
+A,22.9308852,39.3724824
+B,22.5094530,40.2725792
+
+relevant portion of the schema (managed-schema file)
+<fieldType name="location" class="solr.LatLonPointSpatialField" docValues="true"/>
+...
+<field name="lat" type="string" omitTermFreqAndPositions="true" indexed="true" required="true" stored="true"/>
+<field name="location" type="location" multiValued="false" stored="true"/>
+<field name="lon" type="string" omitTermFreqAndPositions="true" indexed="true" stored="true"/>
+
+solrconfig.xml
+<updateRequestProcessorChain name="uuid-location">
+      <processor class="solr.UUIDUpdateProcessorFactory">
+        <str name="fieldName">id</str>
+      </processor>
+        <processor class="solr.CloneFieldUpdateProcessorFactory"> 
+            <str name="source">lat</str> 
+            <str name="dest">location</str> 
+        </processor> 
+        <processor class="solr.CloneFieldUpdateProcessorFactory"> 
+            <str name="source">lon</str> 
+            <str name="dest">location</str> 
+        </processor> 
+       <processor class="solr.ConcatFieldUpdateProcessorFactory"> 
+            <str name="fieldName">location</str> 
+            <str name="delimiter">,</str> 
+        </processor>
+      <processor class="solr.LogUpdateProcessorFactory"/>
+      <processor class="solr.RunUpdateProcessorFactory" />
+     </updateRequestProcessorChain>
+  <initParams path="/update/**,/query,/select,/tvrh,/elevate,/spell,/browse">
+    <lst name="defaults">
+      <str name="df">_text_</str>
+      <str name="update.chain">uuid-location</str>
+    </lst>
+  </initParams>
+and to import the sample file into the core run the following in bash
+
+/opt/solr/bin/post -c your_core_name /opt/solr/sample.csv
+
+
+
+
+this is how to QUERY
+  http://192.168.1.8:8983/solr/cellsites/select?&q=*:*&fq={!geofilt%20sfield=location}&pt=45.2767978,-75.9120855&d=1
+
+
+  
+FYI:  drop the core and data (remove indexes)
+  http://192.168.1.8:8983/solr/admin/cores?action=UNLOAD&core=cellsites&deleteIndex=true
+
+

@@ -3,6 +3,7 @@
 # documentation
 # https://docs.docker.com/install/linux/docker-ce/centos/#upgrade-docker-ce
 # https://docs.docker.com/v1.11/engine/reference/commandline/run/
+
 # https://hub.docker.com/_/solr/
 
 
