@@ -13,9 +13,9 @@ systemctl start docker
 MYSQL_CONTAINER="mysql"
 MYSQL_PORT=3306
 MYSQL_INIT_DATABASE="security"
-MYSQL_ROOT_PASSWORD="jordan2006"
+MYSQL_ROOT_PASSWORD="password1!"
 MYSQL_USER="user"
-MYSQL_USER_PASSWORD="jordan2006"
+MYSQL_USER_PASSWORD="password1!"
 
 echo "1. Creates a mySQL container after downloading the image"
 docker run --name=$MYSQL_CONTAINER -d -p $MYSQL_PORT:3306 -t -e MYSQL_DATABASE=$MYSQL_INIT_DATABASE -e MYSQL_USER=$MYSQL_USER -e MYSQL_PASSWORD=$MYSQL_USER_PASSWORD mysql/mysql-server
