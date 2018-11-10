@@ -14,7 +14,9 @@
      Option: (no autofields)
 	 docker exec -it --user=solr cs_solr bin/solr config -c cellsites -p 8983 -action set-user-property -property update.autoCreateFields -value false
 	 // curl http://hostname:8983/solr/collection/config -d '{"set-user-property": {"update.autoCreateFields":"false"}}'
-	 
+
+
+  https://docs.docker.com/v1.11/engine/reference/commandline/run/	 
 	 
 retrieving the config
 
@@ -93,4 +95,10 @@ this is how to QUERY
 FYI:  drop the core and data (remove indexes)
   http://192.168.1.8:8983/solr/admin/cores?action=UNLOAD&core=cellsites&deleteIndex=true
 
+
+
+
+MYSQL DOCKER 
+
+https://hub.docker.com/r/mysql/mysql-server/
 
