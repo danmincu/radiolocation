@@ -1,0 +1,73 @@
+http://www.plantuml.com/plantuml/img/VLHBZu8m43ul2V-XyOw7JVPcY1lri5cD3xoRMaPiX9QTbXXZ_E_R5bcek8Q4m7oFcSuCZ9McgAiY3uCmK2SkIegq80XCKv7bGAvXy8Qo4kb4eW0SZIOWz3BP7QNISKpUFyBWPhMjOZ2Lx0H8B6D07WLNIpQfj4IQ0TdCaktkS_LbU08qCKcW9X72P55AOSJaZ5p30fGo2cN8Fgg0LOPmwG48DDqYPUPKMGzaKcYKUI--vtdUy6_TIbSecIb1uijIovgreIcNJSLtezPgNK45nkQR7awqzlXn8IwCKs7Ixz0Qx0hVeT5FgQPxggp5ufAivqqPQHDlMk85Sycevb8eBohBU-oXnWGeikDCP5pOFCbolkcbqV8CwDkT-O4tPkv6cJ4aseu1KlyLBNv_9ACewW_iBYDH53zP0b_ihK5Nw06jnaBT9MWargiRDorf3ImQTzhR4clahvjXy5YlI_Z_WFz3dEpvLZsBEdfdqWyjTQVhmEROReOlihY9li3zANG_d_QP38TnVxhrDGQHkl_FBm00
+
+
+
+@startuml
+
+skinparam rectangle {
+	roundCorner<<CentOS_host>> 25
+}
+
+rectangle "Docker host" <<CentOS_host>> {
+
+
+storage REST_API <<net Core>> {
+  component writeMessagesAPI
+  component securityAPI
+  component readTrackingAPI
+  component controlAPI
+  component billingAPI
+}
+
+storage Processor <<net Core>> {
+  component processRadioMessages
+}
+
+
+storage Queue <<Kafka>> {
+queue incomming_radio_messages
+}
+
+storage Database <<MySQL>> {
+  database security
+  database locations
+  database options
+}
+
+
+storage SearchEngine <<SOLR>> {
+  database towers
+  database wifis
+}
+
+}
+
+actor tracked
+actor tracker
+
+tracker <-- readTrackingAPI
+tracked --> writeMessagesAPI
+
+tracker <-- securityAPI
+tracked --> securityAPI
+
+tracker --> controlAPI
+tracked <-- controlAPI
+
+securityAPI <--> security
+controlAPI <--> options
+
+writeMessagesAPI --> incomming_radio_messages
+incomming_radio_messages --> processRadioMessages
+processRadioMessages --> locations
+readTrackingAPI <-- locations
+
+towers --> processRadioMessages
+wifis --> processRadioMessages
+
+tracker <-- billingAPI
+billingAPI ..> readTrackingAPI
+
+
+
+@enduml
