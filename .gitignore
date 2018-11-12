@@ -1,2 +1,7 @@
 infrastructure/cellsites/mozilla/import_data/MLS-full-cell-export-2018-10-21T000000.csv
 infrastructure/cellsites/mozilla/import_data/MLS-full-cell-export-2018-10-21T000000.zip
+infrastructure/kafka/processor/KafkaConsumer/bin/
+infrastructure/kafka/processor/KafkaConsumer/obj/
+infrastructure/kafka/processor/KafkaProducer/bin/Debug/netcoreapp2.1/KafkaProducer.deps.json
+infrastructure/kafka/processor/KafkaProducer/bin/
+infrastructure/kafka/processor/KafkaProducer/obj/

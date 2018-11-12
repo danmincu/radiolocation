@@ -13,6 +13,8 @@ https://docs.docker.com/compose/install/
 
 
   CREATE SOMEWHERE a docker-compose.yml file 
+  !!!!! IMPORTANT !!!! replace the KAFKA_ADVERTISED_HOST_NAME: 0.0.0.0 to match your docker host ip name
+  (read the prerequisites here https://hub.docker.com/r/wurstmeister/kafka/)
  ------------------------------------
  cat > docker-compose.yml
  -------------------------------
@@ -35,6 +37,7 @@ https://docs.docker.com/compose/install/
  --------------------------------------	  
   CTRL + D	  
  -------------------------------------------------	  
+  
+ $ docker-compose up -d
  
  
- docker-compose up -d
