@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="types">
+    <item>Cell sites</item>
+    <item>Exact Alarm</item>
+    <item>Inexact Alarm</item>
+    <item>Unified</item>
+    <item>JobScheduler</item>
+  </string-array>
+</resources>
