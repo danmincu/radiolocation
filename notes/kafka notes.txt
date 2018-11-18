@@ -11,10 +11,24 @@ https://docs.docker.com/compose/install/
  sudo chmod +x /usr/bin/docker-compose
  docker-compose -v
 
+tool: https://superuser.com/questions/621870/test-if-a-port-on-a-remote-system-is-reachable-without-telnet
+test if a port is opened
+  nc -zv 127.0.0.1 80
+  (z - zero bytes, just tests the port. v - verbose)
 
+#reset-offsets in Kafka
+
+sh kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group sample-consumer --topic incomming_radio_messages --reset-offsets --to-earliest --execute
+ 
+ 
   CREATE SOMEWHERE a docker-compose.yml file 
   !!!!! IMPORTANT !!!! replace the KAFKA_ADVERTISED_HOST_NAME: 0.0.0.0 to match your docker host ip name
   (read the prerequisites here https://hub.docker.com/r/wurstmeister/kafka/)
+  also probably 0.0.0.0 should work but there is this bug https://issues.apache.org/jira/browse/KAFKA-4116
+  
+  More to read on this issue: seems like advertised listeners should not be used that is why 0.0.0.0 is not working
+  read here about it https://kafka.apache.org/documentation/
+  
  ------------------------------------
  cat > docker-compose.yml
  -------------------------------

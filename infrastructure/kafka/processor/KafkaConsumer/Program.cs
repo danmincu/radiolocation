@@ -14,7 +14,8 @@
       {
           { "group.id", "sample-consumer" },
           { "bootstrap.servers", "192.168.1.8:9092" },
-          { "enable.auto.commit", "false"}
+          { "enable.auto.commit", "false"},
+           {"auto.offset.reset", "latest" }
       };
 
       using (var consumer = new Consumer<Null, string>(config, null, new StringDeserializer(Encoding.UTF8)))
