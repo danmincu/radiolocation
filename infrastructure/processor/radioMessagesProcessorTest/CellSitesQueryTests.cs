@@ -17,8 +17,6 @@ namespace radioMessagesProcessorTest
             Assert.NotNull(cellSite);
         }
 
-        
-
         [Fact]
         public void TestGetCellNeighbours()
         {
@@ -37,7 +35,6 @@ namespace radioMessagesProcessorTest
                 Lac = "30020",
                 PscPci = "441"
             };
-
 
             var cellSite = subject.GetCellSiteAsync(cellInfoDto).Result;
             Assert.NotNull(cellSite);

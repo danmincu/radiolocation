@@ -25,6 +25,14 @@ namespace RadioMessagesProcessor.Entities
 
         public double GpsLongitude { get; set; }
 
+        public long GpsAge { get; set; }
+
+        public double GpsAccuracy { get; set; }
+
+        public double GpsSpeed { get; set; }
+
+        public double? GpsBearing { get; set; }
+
         public double DecodedLatitude { get; set; }
 
         public double DecodedLongitude { get; set; }

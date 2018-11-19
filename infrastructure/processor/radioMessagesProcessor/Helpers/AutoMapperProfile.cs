@@ -11,6 +11,9 @@ namespace RadioMessagesProcessor.Helpers
             CreateMap<RadioLocationMessage, RadioLocationMessageDto>();
             CreateMap<RadioLocationMessageDto, RadioLocationMessage>();
 
+            CreateMap<RadioCellInfoDto, CellInfoDto>();
+            CreateMap<CellInfoDto, RadioCellInfoDto>();
+
             CreateMap<CellInfo, CellInfoDto>();
             CreateMap<CellInfoDto, CellInfo>();
         }
