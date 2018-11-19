@@ -8,8 +8,11 @@ namespace RadioMessagesProcessor.Helpers
     {
         public AutoMapperProfile()
         {
-            //CreateMap<User, UserDto>();
-            //CreateMap<UserDto, User>();
+            CreateMap<RadioLocationMessage, RadioLocationMessageDto>();
+            CreateMap<RadioLocationMessageDto, RadioLocationMessage>();
+
+            CreateMap<CellInfo, CellInfoDto>();
+            CreateMap<CellInfoDto, CellInfo>();
         }
     }
 }

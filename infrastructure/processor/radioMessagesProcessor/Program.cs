@@ -1,12 +1,10 @@
 ﻿using System.IO;
-using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System;
+using AutoMapper;
 using Microsoft.Extensions.DependencyInjection;
 using StructureMap;
 using Microsoft.Extensions.Logging;
-using RadioMessagesProcessor.Services;
 using radioMessagesProcessor.Services;
 using RadioMessagesProcessor.Helpers;
 using Microsoft.EntityFrameworkCore;
@@ -25,9 +23,8 @@ namespace RadioMessagesProcessor
 
             //add the framework services
             var services = new ServiceCollection()
-                .AddLogging();
-
-          
+                .AddLogging()
+                .AddAutoMapper();
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<DataContext>(
@@ -39,8 +36,6 @@ namespace RadioMessagesProcessor
                             mysqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(1), null);
                         }
                 ));
-
-
 
             var appSettingsSection = configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);

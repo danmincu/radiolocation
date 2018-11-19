@@ -11,11 +11,10 @@ namespace RadioMessagesProcessor.Helpers
 
         public LogLevel logLevel { get; set; }
 
+        public string SolrCellSitesServer { get; set; }
+
+        public string SolrCellSitesServerCore { get; set; }
+
         public Dictionary<string, object> KafkaConsumer { get; set; }
     }
-
-    //public class KafkaConsumer
-    //{
-    //    public string 
-    //}
 }

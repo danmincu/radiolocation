@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 
-namespace RadioMessagesProcessor.Entities
+namespace RadioMessagesProcessor.Dtos
 {
-    public class RadioLocationMessage
+    public class RadioLocationMessageDto
     {
         public System.Guid Id { get; set; }
 
@@ -14,11 +14,6 @@ namespace RadioMessagesProcessor.Entities
 
         public byte[] RawEvent { get; set; }
 
-        /// <summary>
-        /// Contains a serialized list of <see cref="CellInfo"/>
-        /// </summary>
-        public byte[] DecodedEvent { get; set; }
-
         public System.DateTime DecodedDateUTC { get; set; }
 
         public double GpsLatitude { get; set; }
@@ -28,6 +23,8 @@ namespace RadioMessagesProcessor.Entities
         public double DecodedLatitude { get; set; }
 
         public double DecodedLongitude { get; set; }
+
+        public IEnumerable<CellInfoDto> Cells { get; set; }
     }
 
 }
