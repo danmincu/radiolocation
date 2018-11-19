@@ -35,14 +35,6 @@ namespace radioMessagesProcessor.Services
 
         public void Run()
         {
-            //var config = new Dictionary<string, object>
-            //          {
-            //              { "group.id", "sample-consumer" },
-            //              { "bootstrap.servers", "192.168.1.8:9092" },
-            //              { "enable.auto.commit", "false"},
-            //              {"auto.offset.reset", "latest" }
-            //          };
-
             using (var consumer = new Consumer<Null, string>(this.appSettings.KafkaConsumer, null, new StringDeserializer(Encoding.UTF8)))
             {
                 consumer.Subscribe(new string[] { this.appSettings.MessagesTopic });
@@ -50,19 +42,16 @@ namespace radioMessagesProcessor.Services
                 consumer.OnConsumeError += (_, msg) =>
                 {
                     this.logger.LogError($"CONSUME ERROR: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} \n{msg.Value}");
-                    //Console.WriteLine($"CONSUME ERROR: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
                 };
 
                 consumer.OnError += (_, ex) =>
                 {
-                    //Console.WriteLine($"ERROR: {ex}");
                     this.logger.LogError($"ERROR: {ex}");
                 };
 
                 consumer.OnMessage += (_, msg) =>
                 {
                     this.logger.LogTrace($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} \n{msg.Value}");
-                    //Console.WriteLine($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} {msg.Value}");
                     consumer.CommitAsync(msg);
                 };
 

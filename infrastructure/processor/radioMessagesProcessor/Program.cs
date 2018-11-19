@@ -23,13 +23,6 @@ namespace RadioMessagesProcessor
               .AddJsonFile("appsettings.json", true)
               .Build();
 
-            //    Uncomment to use the built in container
-            //    var serviceProvider = new ServiceCollection()
-            //        .AddLogging()
-            //        .AddSingleton<IFooService, FooService>()
-            //        .AddSingleton<BarService>()
-            //        .BuildServiceProvider();
-
             //add the framework services
             var services = new ServiceCollection()
                 .AddLogging();

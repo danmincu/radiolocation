@@ -7,3 +7,4 @@ infrastructure/kafka/processor/KafkaProducer/bin/
 infrastructure/kafka/processor/KafkaProducer/obj/
 android/PCI working/app/build/
 infrastructure/processor/radioMessagesProcessor/.vs/
+.vs/
