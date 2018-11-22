@@ -26,7 +26,13 @@ namespace radioMessagesProcessor.Services
         /// <param name="radioLocation">the undecoded <see cref="RadioLocationMessageDto"/> message</param>
         /// <param name="error_message">errors encounters during decoding</param>
         /// <returns>true if succesfully decoded</returns>
-        bool Decode(RadioLocationMessageDto radioLocation, out string error_message);
+        Task<DecodeResult> DecodeAsync(RadioLocationMessageDto radioLocation);
+    }
+
+    public class DecodeResult
+    {
+        public bool Success { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     public class Decoder : IDecoder
@@ -40,13 +46,93 @@ namespace radioMessagesProcessor.Services
             this.cellsitesQueryService = cellsitesQueryService;
         }
 
-        
-        public bool Decode(RadioLocationMessageDto radioLocation, out string error_message)
+
+        public async Task<DecodeResult> DecodeAsync(RadioLocationMessageDto radioLocation)
         {
-            throw new NotImplementedException();
+            //populate the gps locations
+            // main cell is either the registered one or the one with mcc/mnc/lac/cid populated
+            var mainCell = radioLocation.Cells.FirstOrDefault(c => c.IsReg) ??
+                radioLocation.Cells.FirstOrDefault(c => !(c.Mnc == "-1") &&
+                    !(c.Mnc == "-1") &&
+                    !(c.Lac == "-1") &&
+                    !(c.Cid == "-1"));
+            if (mainCell == null)
+            {
+                return new DecodeResult
+                {
+                    Success = false,
+                    ErrorMessage = "not enought information to decode the radio message."
+                };
+            }
+
+            mainCell.IsMain = true;
+
+            var solrCell = await this.cellsitesQueryService.GetCellSiteAsync(mainCell);
+            if (solrCell != null)
+            {
+                Populate(solrCell, mainCell);
+                mainCell.IsDecoded = true;
+
+
+                //at least one cell has PscPci so we should get the geographical neighbours
+                if (radioLocation.CellsExcept(mainCell).Any(c => !string.IsNullOrEmpty(c.PscPci)))
+                {
+                    var neighbours = await this.cellsitesQueryService.GetNeighboursAsync(5, mainCell).ConfigureAwait(false);
+                    foreach (var cell in radioLocation.CellsExcept(mainCell).Where(c => !string.IsNullOrEmpty(c.PscPci)))
+                    {
+                        var identifyCell = this.cellsitesQueryService.MatchCell(cell, mainCell, neighbours.ToList());
+                        if (identifyCell != null)
+                        {
+                            Populate(identifyCell, cell);
+                            cell.IsDecoded = true;
+                        }
+                    }
+                }
+
+                var rssiRanges = new int[,] { { -60, 400 }, { -70, 800 }, { -80, 1600 }, { -90, 3200 }, { -100, 6400 }, { -110, 12800 }, { -120, 25600 } };
+
+
+                //todo - clip hexagons here and find the center of the mass of the intersection
+                radioLocation.Rssi = mainCell.Rssi;
+                radioLocation.DecodedLatitude = mainCell.Latitude;
+                radioLocation.DecodedLongitude = mainCell.Longitude;
+
+                return new DecodeResult
+                {
+                    Success = true
+                };
+            }
+
+            return new DecodeResult
+            {
+                Success = false,
+                ErrorMessage = "cannot find the main cell in the database."
+            };
         }
 
-        
+        private void Populate(CellSiteSolr from, CellInfoDto to)
+        {
+            if (to.Mnc == "-1")
+                to.Mnc = from.net;
+            if (to.Mcc == "-1")
+                to.Mcc = from.mcc;
+            if (to.Lac == "-1")
+                to.Lac = from.area;
+            if (to.Cid == "-1")
+                to.Cid = from.cell;
+            if (to.PscPci == "-1")
+                to.PscPci = from.unit;
+
+            to.Latitude = Double.Parse(from.lat);
+            to.Longitude = Double.Parse(from.lon);
+            to.Created = DateTimeOffset.FromUnixTimeSeconds(from.created.FirstOrDefault()).DateTime;
+            to.Updated = DateTimeOffset.FromUnixTimeSeconds(from.updated).DateTime;
+            to.Range = from.range;
+            to.Samples = from.samples;
+        }
+
+
+
         public RadioLocationMessageDto FromRawEvent(string rawEvent, out bool isSuccessful, out string error_message)
         {
             var lines = rawEvent.Split("\n");
@@ -84,7 +170,7 @@ namespace radioMessagesProcessor.Services
                 error_message = "wrong format for <<#latitude,longitude,age,accuracy,speed,bearing>> line";
                 return null;
             }
-            
+
             //# latitude,longitude,age,accuracy,speed,bearing
             // 45.277281,-75.925078,1156,18.224,0.0,?
             result.CollectionDateUTC = DateTime.UtcNow;
@@ -131,12 +217,12 @@ namespace radioMessagesProcessor.Services
                 // wcdma,302,490,1323033,20,-101,-1,6,-1,400,1
                 // wcdma,-1,-1,-1,-1,-99,-1,7,-1,167,0
                 var cellinfoLine = lines[i].Split(',');
-                if (cellinfoLine.Length == 11)
+                if (cellinfoLine.Length >= 10)
                 {
                     RadioCellInfoDto radioCellInfoDto = RadioCellInfoDto.Parse(cellinfoLine);
                     result.AddCell(mapper.Map<CellInfoDto>(radioCellInfoDto));
                     // - todo when things don't go smooth
-                 }
+                }
                 else
                 {
                     // - todo when things don't go smooth

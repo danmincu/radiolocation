@@ -7,11 +7,19 @@ namespace radioMessagesProcessorTest
 {
     public class CellSitesQueryTests
     {
+        public static ICellsitesQueryService GetRealInstance(IServiceProvider serviceProvider)
+        {
+            return new CellsitesQueryService(serviceProvider, new RadioMessagesProcessor.Helpers.AppSettings
+            {
+                SolrCellSitesServer = "192.168.1.8:8983",
+                SolrCellSitesServerCore = "cellsites"
+            });
+        }
+
         [Fact]
         public void TestGetCell()
         {
-            var subject = new CellsitesQueryService(new RadioMessagesProcessor.Helpers.AppSettings { SolrCellSitesServer = "192.168.1.8:8983",
-                SolrCellSitesServerCore = "cellsites" });
+            var subject = GetRealInstance(null);
             var cellSite = subject.GetCellSiteAsync(new RadioMessagesProcessor.Dtos.CellInfoDto() { Radio = "lte", Mcc="302", Mnc="490", Cid= "102715167", Lac="30020",
                 PscPci ="441" }).Result;
             Assert.NotNull(cellSite);
@@ -20,11 +28,7 @@ namespace radioMessagesProcessorTest
         [Fact]
         public void TestGetCellNeighbours()
         {
-            var subject = new CellsitesQueryService(new RadioMessagesProcessor.Helpers.AppSettings
-            {
-                SolrCellSitesServer = "192.168.1.8:8983",
-                SolrCellSitesServerCore = "cellsites"
-            });
+            var subject = GetRealInstance(null);
 
             var cellInfoDto = new RadioMessagesProcessor.Dtos.CellInfoDto()
             {

@@ -21,7 +21,7 @@ namespace RadioMessagesProcessor.Dtos
                 Asu = input[7],
                 Ta = input[8],
                 PscPci = input[9],
-                IsReg = input[10].Equals("1", System.StringComparison.OrdinalIgnoreCase)
+                IsReg = input.Length == 11 ? input[10].Equals("1", System.StringComparison.OrdinalIgnoreCase) : false
             };
         }
 

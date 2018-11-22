@@ -54,7 +54,7 @@ namespace radioMessagesProcessor.Services
                     this.logger.LogError($"ERROR: {ex}");
                 };
 
-                consumer.OnMessage += (_, msg) =>
+                consumer.OnMessage += async (_, msg) =>
                 {
                     this.logger.LogTrace($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} \n{msg.Value}");
 
@@ -67,21 +67,40 @@ namespace radioMessagesProcessor.Services
                         // todo - add the errnous message to poison queue
                     }
                     else
+                    if (rlm.DeviceDate.ToLocalTime().Day == 18 && rlm.DeviceDate.ToLocalTime().Hour >= 13 && rlm.DeviceDate.ToLocalTime().Hour <= 18)
                     {
-                        var didDecode = this.decoder.Decode(rlm, out string decode_error_message);
-                        if (!didDecode)
+                        DecodeResult didDecode = new DecodeResult() { Success = false };
+                        try
                         {
-                            this.logger.LogWarning(decode_error_message);
+                            didDecode = await this.decoder.DecodeAsync(rlm).ConfigureAwait(false);
+                        }
+                        catch
+                        {
+                            //burry
+                            logger.LogError($"Error decoding {rlm.ToFriendlyName()}");                        
+                        }
+                        if (!didDecode.Success)
+                        {
+                            this.logger.LogWarning(didDecode.ErrorMessage);
                             // todo - add the errnous message to poison queue
                         }
                         else
                         {
-                            this.radioLocationMessagesService.Insert(this.mapper.Map<RadioLocationMessage>(rlm));
+                            try
+                            {
+                                GoogleEarthPlacesCreator.ToPlaceFile(rlm);
+                            }
+                            catch
+                            {
+                                //burry don't care much if a file won't get created
+                            }
+
+                            //this.radioLocationMessagesService.Insert(this.mapper.Map<RadioLocationMessage>(rlm));
                         }
                     }
 
                     // move on
-                    consumer.CommitAsync(msg);
+                    await consumer.CommitAsync(msg).ConfigureAwait(false);
                 };
 
                 Console.WriteLine("Incomming mesage are to be displayed here:");

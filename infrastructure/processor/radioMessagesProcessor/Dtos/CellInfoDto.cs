@@ -25,6 +25,14 @@ namespace RadioMessagesProcessor.Dtos
         public DateTime Updated { get; set; }
 
         public int Range { get; set; }
+
+        public bool IsDecoded { get; set; }
+        public bool IsMain { get; set; }
+
+        public string ToFriendlyName()
+        {
+            return $"{this.Rssi} [{this.Radio}:{this.Mnc}-{this.Mcc}-{this.Lac}-{this.Cid}]";
+        }
         #endregion
 
     }

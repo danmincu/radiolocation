@@ -41,8 +41,8 @@
         public int range { get; set; }
         public int samples { get; set; }
         public int changeable { get; set; }
-        public int[] created { get; set; }
-        public int updated { get; set; }
+        public long[] created { get; set; }
+        public long updated { get; set; }
         public string id { get; set; }
         public string location { get; set; }
         public long _version_ { get; set; }

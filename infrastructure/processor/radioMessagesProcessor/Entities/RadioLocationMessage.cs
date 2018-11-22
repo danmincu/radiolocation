@@ -33,6 +33,8 @@ namespace RadioMessagesProcessor.Entities
 
         public double? GpsBearing { get; set; }
 
+        public int Rssi { get; set; }
+
         public double DecodedLatitude { get; set; }
 
         public double DecodedLongitude { get; set; }

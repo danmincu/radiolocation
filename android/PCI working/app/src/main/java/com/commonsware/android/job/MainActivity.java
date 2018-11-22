@@ -91,15 +91,13 @@ public class MainActivity extends AbstractPermissionActivity
     @Override
     protected void onStart() {
         super.onStart();
-//        lmgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,50, this);
-
+        //lmgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,5, this);
     }
 
     @Override
     @SuppressWarnings({"MissingPermission"})
     public void onStop() {
-        //lmgr.removeUpdates(this);
-
+        lmgr.removeUpdates(this);
         super.onStop();
     }
 
@@ -187,11 +185,13 @@ public class MainActivity extends AbstractPermissionActivity
     switch(type.getSelectedItemPosition()) {
         case 0:
           if (isChecked) {
+              lmgr.requestLocationUpdates(LocationManager.GPS_PROVIDER,10000,5, this);
               mUIUpdater.startUpdates();
           }
-          else
+          else {
+            lmgr.removeUpdates(this);
             mUIUpdater.stopUpdates();
-            //Invoke();
+          }
             break;
       case 1:
         manageExact(isChecked);
@@ -246,8 +246,15 @@ public class MainActivity extends AbstractPermissionActivity
       sb.append("#deviceId,deviceTime\n");
       sb.append(deviceId +',' + Calendar.getInstance().getTime().getTime() + '\n');
       sb.append("#latitude,longitude,age,accuracy,speed,bearing\n");
-      sb.append(String.format("%.6f,%.6f,%s,%s,%s,%s", location.getLatitude(), location.getLongitude(),age_ms_api_17(location), location.hasAccuracy() ? location.getAccuracy() : "?",
-              location.hasSpeed() ? location.getSpeed() : "?", location.hasBearing() ? location.getBearing() : "?" )+'\n');
+      if (location != null)
+      {
+        sb.append(String.format("%.6f,%.6f,%s,%s,%s,%s", location.getLatitude(), location.getLongitude(), age_ms_api_17(location), location.hasAccuracy() ? location.getAccuracy() : "?",
+                location.hasSpeed() ? location.getSpeed() : "?", location.hasBearing() ? location.getBearing() : "?") + '\n');
+      }
+      else {
+        sb.append(String.format("0,0,0,?,?,?\n"));
+      }
+
       sb.append("#" + CellInfo.header()+'\n');
       for (int i =0; i < cells.size(); i++)
       {
@@ -346,6 +353,7 @@ public class MainActivity extends AbstractPermissionActivity
      * by removing the callback.
      */
     public synchronized void stopUpdates(){
+
       mHandler.removeCallbacks(mStatusChecker);
     }
 
