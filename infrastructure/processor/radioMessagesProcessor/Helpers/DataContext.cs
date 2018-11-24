@@ -18,10 +18,38 @@ using Microsoft.Extensions.Options;
 using Pomelo.EntityFrameworkCore.MySql;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
-
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace RadioMessagesProcessor.Helpers
 {
+
+    // command for options creation:
+    // dotnet ef dbcontext scaffold "Server=192.168.1.8;Database=locations;User=locuser;Password=password1!;" "Pomelo.EntityFrameworkCore.MySql"
+
+    // command for migration creation:
+    // dotnet ef migrations add InitialCreate
+    
+    // command for applying the migration to the db:
+    // dotnet ef database update
+
+    public class DbContextFactory : IDesignTimeDbContextFactory<DataContext>
+    {
+        public DataContext CreateDbContext(string[] args)
+        {
+            var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+
+            optionsBuilder.UseMySql("Server=192.168.1.8; Database=locations; User=locuser; Password=password1!;",
+                            mysqlOptions =>
+                            {
+                                mysqlOptions.MaxBatchSize(1);
+                                mysqlOptions.ServerVersion(new Version(8, 0, 13), ServerType.MySql);
+                                mysqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(1), null);
+                            });
+
+            return new DataContext(optionsBuilder.Options);
+        }
+    }
+
     public class DataContext : DbContext
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options) { }
@@ -32,7 +60,7 @@ namespace RadioMessagesProcessor.Helpers
         // {
         //     if (!optionsBuilder.IsConfigured)
         //     {
-        //         optionsBuilder.UseMySql("Server=192.168.1.8; Database=security; User=user; Password=password1!;",
+        //         optionsBuilder.UseMySql("Server=192.168.1.8; Database=locations; User=locuser; Password=password1!;",
         //                 mysqlOptions =>
         //                 {
         //                     mysqlOptions.MaxBatchSize(1);
