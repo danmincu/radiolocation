@@ -9,6 +9,7 @@ using System;
 using System.Text;
 using AutoMapper;
 using RadioMessagesProcessor.Entities;
+using RadioMessagesProcessor.Dtos;
 
 namespace radioMessagesProcessor.Services
 {
@@ -85,18 +86,20 @@ namespace radioMessagesProcessor.Services
                         }
                         else
                         {
+
+                            // this is just debug info - I should read this from database
                             try
                             {
-                                GoogleEarthPlacesCreator.ToPlaceFile(rlm);
+                                await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
                             }
                             catch
                             {
                                 //burry don't care much if a file won't get created
                             }
+                            // end debug info
 
-                            var dest = this.mapper.Map<RadioLocationMessage>(rlm);
                             // create on demand this service to insure I get a transient db context
-                            await this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(dest).ConfigureAwait(false);
+                            await this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);
                         }
                     }
 

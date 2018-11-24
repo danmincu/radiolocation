@@ -6,11 +6,13 @@ namespace RadioMessagesProcessor.Dtos
 {
     public class RadioLocationMessageDto
     {
+        private List<CellInfoDto> cells;
+
         public RadioLocationMessageDto() : this(Guid.NewGuid()) { }
 
         public RadioLocationMessageDto(Guid id)
         {
-            this.Cells = new List<CellInfoDto>();
+            this.cells = new List<CellInfoDto>();
             this.Id = id;
         }
 
@@ -57,7 +59,20 @@ namespace RadioMessagesProcessor.Dtos
 
         public double DecodedLongitude { get; set; }
 
-        public IEnumerable<CellInfoDto> Cells { get; set; }
+        public IEnumerable<CellInfoDto> Cells
+        {
+            get
+            {
+                return this.cells;
+            }
+            set
+            {
+                foreach (var item in value ?? Enumerable.Empty<CellInfoDto>())
+                {
+                    this.AddCell(item);
+                }
+            }
+        }
 
         public string ToFriendlyName()
         {

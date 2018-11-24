@@ -8,7 +8,7 @@ namespace radioMessagesProcessor.Services
 {
     public class GoogleEarthPlacesCreator
     {
-        public static void ToPlaceFile(RadioLocationMessageDto locationEvent)
+        public static Task ToPlaceFile(RadioLocationMessageDto locationEvent)
         {
             var sb = new System.Text.StringBuilder();
             sb.Append(placemark_main.Replace("%%name%%", "GPS location")
@@ -23,7 +23,7 @@ namespace radioMessagesProcessor.Services
             }
 
             var fileNamePostFix = locationEvent.DeviceDate.ToLocalTime().ToString().Replace(":", "-").Replace(" ", "_");
-            System.IO.File.WriteAllText($"c:\\temp\\kmls\\test-{fileNamePostFix}.kml", klm_file.Replace("%%placemarks%%", sb.ToString()));
+            return System.IO.File.WriteAllTextAsync($"c:\\temp\\kmls\\test-{fileNamePostFix}.kml", klm_file.Replace("%%placemarks%%", sb.ToString()));
         }
 
         static string klm_file = @"<?xml version=""1.0"" encoding=""UTF-8""?>

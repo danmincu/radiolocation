@@ -14,7 +14,8 @@ namespace RadioMessagesProcessor.Helpers
             CreateMap<RadioLocationMessage, RadioLocationMessageDto>()
                 .ForMember(
                     d => d.Cells, 
-                    m => m.ResolveUsing(s => JsonConvert.DeserializeObject<IEnumerable<CellInfoDto>>(ZipUnzip.Unzip(s.DecodedEvent))));
+                    m => m.ResolveUsing(s => JsonConvert.DeserializeObject<IEnumerable<CellInfoDto>>(ZipUnzip.Unzip(s.DecodedEvent)))
+                    );
 
             CreateMap<RadioLocationMessageDto, RadioLocationMessage>()
                 .ForMember(d => d.DecodedEvent, m => m.ResolveUsing(s => ZipUnzip.Zip(JsonConvert.SerializeObject(s.Cells))));
