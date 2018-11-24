@@ -45,8 +45,7 @@ namespace WriteMessagesApi.Controllers
         [HttpPost("radioLocation")]
         public IActionResult RadioLocation([FromBody]MessageDto message)
         {
-            var locationText = message.Location;
-
+            var locationText = $"#collectionDateTime\n{System.DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}\n{message.Location}";
 
             KafkaProducer.OnLog += (_, msg) =>
                        {

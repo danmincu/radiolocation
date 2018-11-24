@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using RadioMessagesProcessor.Entities;
 using RadioMessagesProcessor.Helpers;
 
@@ -7,7 +8,7 @@ namespace RadioMessagesProcessor.Services
 {
     public interface IRadioLocationMessagesService
     {
-        void Insert(RadioLocationMessage radioLocationMessage);
+        Task<int> InsertAsync(RadioLocationMessage radioLocationMessage);
         List<RadioLocationMessage> GetByImeiAndDateTimeRange(string imei, DateTime fromUtc, DateTime toUtc);
 
         RadioLocationMessage GetById(Guid id);
@@ -24,10 +25,11 @@ namespace RadioMessagesProcessor.Services
             _context = context;
         }
 
-        public void Insert(RadioLocationMessage radioLocationMessage)
+        public async Task<int> InsertAsync(RadioLocationMessage radioLocationMessage)
         {
-            _context.RadioLocationMessages.Add(radioLocationMessage);
-            _context.SaveChanges();
+            await _context.RadioLocationMessages.AddAsync(radioLocationMessage).ConfigureAwait(false);
+            return await _context.SaveChangesAsync().ConfigureAwait(false);
+
         }
 
         public void Delete(Guid id)

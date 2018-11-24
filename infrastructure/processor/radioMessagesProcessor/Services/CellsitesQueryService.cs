@@ -37,14 +37,18 @@ namespace radioMessagesProcessor.Services
         //"GSM",3546674]},
 
         private AppSettings appSettings;
-        public CellsitesQueryService(IServiceProvider serviceProvider, IOptions<AppSettings> appSettingsProvider)
+        public CellsitesQueryService(IServiceProvider serviceProvider, IOptions<AppSettings> appSettingsProvider) :
+            this(serviceProvider, appSettingsProvider.Value){ }
+
+        public CellsitesQueryService(IServiceProvider serviceProvider, AppSettings appSettings)
         {
-            this.appSettings = appSettingsProvider.Value;
+            this.appSettings = appSettings;
             this.client = new HttpClient();
             this.client.DefaultRequestHeaders.Accept.Clear();
             this.client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/vnd.github.v3+json"));
             this.logger = serviceProvider?.GetService<ILoggerFactory>().CreateLogger<CellsitesQueryService>();
         }
+
 
         private string ToSolrRadio(string radio)
         {

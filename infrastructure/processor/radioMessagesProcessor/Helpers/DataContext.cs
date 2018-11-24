@@ -19,6 +19,7 @@ using Pomelo.EntityFrameworkCore.MySql;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
 using Microsoft.EntityFrameworkCore.Design;
+using System.IO;
 
 namespace RadioMessagesProcessor.Helpers
 {
@@ -36,9 +37,14 @@ namespace RadioMessagesProcessor.Helpers
     {
         public DataContext CreateDbContext(string[] args)
         {
+            var configuration = new ConfigurationBuilder()
+           .SetBasePath(Directory.GetCurrentDirectory())
+           .AddJsonFile("appsettings.json", true)
+           .Build();
+
             var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
 
-            optionsBuilder.UseMySql("Server=192.168.1.8; Database=locations; User=locuser; Password=password1!;",
+            optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
                             mysqlOptions =>
                             {
                                 mysqlOptions.MaxBatchSize(1);

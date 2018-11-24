@@ -20,20 +20,19 @@ namespace radioMessagesProcessor.Services
     public class MessageProcessor : IMessageProcessor
     {
         AppSettings appSettings;
-        IRadioLocationMessagesService radioLocationMessagesService;
+        IServiceProvider serviceProvider;
         IDecoder decoder;
         ILogger<MessageProcessor> logger;
         IMapper mapper;
 
         public MessageProcessor(IServiceProvider serviceProvider,
             IMapper mapper,
-            IOptions<AppSettings> appSettingsProvider, 
-            IRadioLocationMessagesService radioLocationMessagesService, 
+            IOptions<AppSettings> appSettingsProvider,
             IDecoder decoder)
-        {
+        {   
             this.mapper = mapper;
             this.appSettings = appSettingsProvider.Value;
-            this.radioLocationMessagesService = radioLocationMessagesService;
+            this.serviceProvider = serviceProvider;
             this.decoder = decoder;
             this.logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MessageProcessor>();
         }
@@ -67,7 +66,7 @@ namespace radioMessagesProcessor.Services
                         // todo - add the errnous message to poison queue
                     }
                     else
-                    if (rlm.DeviceDate.ToLocalTime().Day == 18 && rlm.DeviceDate.ToLocalTime().Hour >= 13 && rlm.DeviceDate.ToLocalTime().Hour <= 18)
+                    // filter if you want if (rlm.DeviceDate.ToLocalTime().Day == 18 && rlm.DeviceDate.ToLocalTime().Hour >= 13 && rlm.DeviceDate.ToLocalTime().Hour <= 18)
                     {
                         DecodeResult didDecode = new DecodeResult() { Success = false };
                         try
@@ -77,7 +76,7 @@ namespace radioMessagesProcessor.Services
                         catch
                         {
                             //burry
-                            logger.LogError($"Error decoding {rlm.ToFriendlyName()}");                        
+                            logger.LogError($"Error decoding {rlm.ToFriendlyName()}");
                         }
                         if (!didDecode.Success)
                         {
@@ -95,7 +94,9 @@ namespace radioMessagesProcessor.Services
                                 //burry don't care much if a file won't get created
                             }
 
-                            //this.radioLocationMessagesService.Insert(this.mapper.Map<RadioLocationMessage>(rlm));
+                            var dest = this.mapper.Map<RadioLocationMessage>(rlm);
+                            // create on demand this service to insure I get a transient db context
+                            await this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(dest).ConfigureAwait(false);
                         }
                     }
 

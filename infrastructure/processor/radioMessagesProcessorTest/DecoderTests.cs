@@ -12,7 +12,9 @@ namespace radioMessagesProcessorTest
         [Fact]
         public void DecodeRawEventTest()
         {
-            string rawEvent = @"#deviceId,deviceTime
+            string rawEvent = @"#collectionDateTime
+1543034822177
+#deviceId,deviceTime
 358511080402476,1542594634630
 #latitude,longitude,age,accuracy,speed,bearing
 45.277281,-75.925078,1156,18.224,0.0,?
@@ -34,6 +36,7 @@ wcdma,-1,-1,-1,-1,-111,-1,1,-1,284,0".Replace("\r", "");
             Assert.True(isSuccessful);
             Assert.Empty(error_message);
             Assert.Equal("358511080402476", locationEvent.Imei);
+            Assert.Equal(DateTime.Parse("2018-11-24 4:47:02.177 AM"), locationEvent.CollectionDateUTC);
             Assert.Equal(DateTime.Parse("2018-11-19 2:30:34.630 AM"), locationEvent.DeviceDate);
 
             Assert.Equal(45.277281, locationEvent.GpsLatitude);
@@ -82,7 +85,9 @@ wcdma,-1,-1,-1,-1,-111,-1,1,-1,284,0".Replace("\r", "");
         [Fact]
         public void DecodeTest()
         {
-            string rawEvent = @"#deviceId,deviceTime
+            string rawEvent = @"#collectionDateTime
+1543034822177
+#deviceId,deviceTime
 358511080402476,1542594180392
 #latitude,longitude,age,accuracy,speed,bearing
 45.277281,-75.925078,702,18.224,0.0,?

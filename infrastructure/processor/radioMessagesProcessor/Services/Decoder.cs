@@ -49,7 +49,7 @@ namespace radioMessagesProcessor.Services
 
         public async Task<DecodeResult> DecodeAsync(RadioLocationMessageDto radioLocation)
         {
-            //populate the gps locations
+            // populate the gps locations
             // main cell is either the registered one or the one with mcc/mnc/lac/cid populated
             var mainCell = radioLocation.Cells.FirstOrDefault(c => c.IsReg) ??
                 radioLocation.Cells.FirstOrDefault(c => !(c.Mnc == "-1") &&
@@ -96,6 +96,7 @@ namespace radioMessagesProcessor.Services
                 radioLocation.Rssi = mainCell.Rssi;
                 radioLocation.DecodedLatitude = mainCell.Latitude;
                 radioLocation.DecodedLongitude = mainCell.Longitude;
+                radioLocation.DecodedDateUTC = DateTime.UtcNow;
 
                 return new DecodeResult
                 {
@@ -136,35 +137,44 @@ namespace radioMessagesProcessor.Services
         public RadioLocationMessageDto FromRawEvent(string rawEvent, out bool isSuccessful, out string error_message)
         {
             var lines = rawEvent.Split("\n");
-            if (!lines[0].Equals("#deviceId,deviceTime"))
+            if (!lines[0].Equals("#collectionDateTime"))
+            {
+                isSuccessful = false;
+                error_message = "missing <<#collectionDateTime>> line";
+                return null;
+            }
+
+            var result = new RadioLocationMessageDto();
+            result.CollectionDateUTC = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lines[1])).DateTime;
+
+
+            if (!lines[2].Equals("#deviceId,deviceTime"))
             {
                 isSuccessful = false;
                 error_message = "missing <<#deviceId,deviceTime>> line";
                 return null;
             }
 
-            var result = new RadioLocationMessageDto();
-
-            var line1split = lines[1].Trim().Split(",");
-            if (line1split.Count() != 2)
+            var deviceIdTime = lines[3].Trim().Split(",");
+            if (deviceIdTime.Count() != 2)
             {
                 isSuccessful = false;
                 error_message = "wrong format for <<#deviceId,deviceTime>> line";
                 return null;
             }
 
-            result.Imei = line1split[0];
-            result.DeviceDate = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(line1split[1])).DateTime;
+            result.Imei = deviceIdTime[0];
+            result.DeviceDate = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(deviceIdTime[1])).DateTime;
 
-            if (!lines[2].Equals("#latitude,longitude,age,accuracy,speed,bearing"))
+            if (!lines[4].Equals("#latitude,longitude,age,accuracy,speed,bearing"))
             {
                 isSuccessful = false;
                 error_message = "missing <<#latitude,longitude,age,accuracy,speed,bearing>> line";
                 return null;
             }
 
-            var line3split = lines[3].Trim().Split(",");
-            if (line3split.Count() != 6)
+            var gpsLine = lines[5].Trim().Split(",");
+            if (gpsLine.Count() != 6)
             {
                 isSuccessful = false;
                 error_message = "wrong format for <<#latitude,longitude,age,accuracy,speed,bearing>> line";
@@ -173,45 +183,44 @@ namespace radioMessagesProcessor.Services
 
             //# latitude,longitude,age,accuracy,speed,bearing
             // 45.277281,-75.925078,1156,18.224,0.0,?
-            result.CollectionDateUTC = DateTime.UtcNow;
-            if (double.TryParse(line3split[0], out double latitude))
+            if (double.TryParse(gpsLine[0], out double latitude))
             {
                 result.GpsLatitude = latitude;
             }
 
-            if (double.TryParse(line3split[1], out double longitude))
+            if (double.TryParse(gpsLine[1], out double longitude))
             {
                 result.GpsLongitude = longitude;
             }
 
-            if (long.TryParse(line3split[2], out long agems))
+            if (long.TryParse(gpsLine[2], out long agems))
             {
                 result.GpsAge = agems;
             }
 
-            if (double.TryParse(line3split[3], out double accuracy))
+            if (double.TryParse(gpsLine[3], out double accuracy))
             {
                 result.GpsAccuracy = accuracy;
             }
 
-            if (double.TryParse(line3split[4], out double speed))
+            if (double.TryParse(gpsLine[4], out double speed))
             {
                 result.GpsSpeed = speed;
             }
 
-            if (double.TryParse(line3split[5], out double bearing))
+            if (double.TryParse(gpsLine[5], out double bearing))
             {
                 result.GpsBearing = bearing;
             }
 
-            if (!lines[4].Equals("#Radio,Mcc,Mnc,Cid,Lac,SignalS,Level,mAsu,mTa,PscPci,isReg"))
+            if (!lines[6].Equals("#Radio,Mcc,Mnc,Cid,Lac,SignalS,Level,mAsu,mTa,PscPci,isReg"))
             {
                 isSuccessful = false;
                 error_message = "missing <<#Radio,Mcc,Mnc,Cid,Lac,SignalS,Level,mAsu,mTa,PscPci,isReg>> line";
                 return null;
             }
 
-            for (int i = 5; i < lines.Length; i++)
+            for (int i = 7; i < lines.Length; i++)
             {
                 //# Radio,Mcc,Mnc,Cid,Lac,SignalS,Level,mAsu,mTa,PscPci,isReg
                 // wcdma,302,490,1323033,20,-101,-1,6,-1,400,1
@@ -231,7 +240,7 @@ namespace radioMessagesProcessor.Services
 
             isSuccessful = true;
             error_message = "";
-            result.RawEvent = ZipUnzip.Zip(rawEvent);
+            result.RawEvent = ZipUnzip.Zip(rawEvent);            
             return result;
         }
     }

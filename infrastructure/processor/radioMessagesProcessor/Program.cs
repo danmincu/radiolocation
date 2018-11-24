@@ -9,6 +9,8 @@ using radioMessagesProcessor.Services;
 using RadioMessagesProcessor.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
+using Microsoft.EntityFrameworkCore.Design;
+using RadioMessagesProcessor.Services;
 
 namespace RadioMessagesProcessor
 {
@@ -26,8 +28,10 @@ namespace RadioMessagesProcessor
                 .AddLogging()
                 .AddAutoMapper();
 
+            
+
             var connectionString = configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContextPool<DataContext>(
+            services.AddDbContext<DataContext>(
                     options => options.UseMySql(connectionString,
                         mysqlOptions =>
                         {
@@ -35,13 +39,16 @@ namespace RadioMessagesProcessor
                             mysqlOptions.ServerVersion(new Version(8, 0, 13), ServerType.MySql);
                             mysqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(1), null);
                         }
-                ));
+                ), ServiceLifetime.Transient);
+
 
             var appSettingsSection = configuration.GetSection("AppSettings");
             services.Configure<AppSettings>(appSettingsSection);
 
             var appSettings = appSettingsSection.Get<AppSettings>();
 
+
+            services.AddTransient<IRadioLocationMessagesService, RadioLocationMessagesService>();
 
             //add structuremp
             var container = new Container();
@@ -58,7 +65,6 @@ namespace RadioMessagesProcessor
             });
 
             var serviceProvider = container.GetInstance<IServiceProvider>();
-
 
             //configure console logging
             serviceProvider
