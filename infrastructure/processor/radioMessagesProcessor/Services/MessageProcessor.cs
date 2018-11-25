@@ -58,53 +58,61 @@ namespace radioMessagesProcessor.Services
                 {
                     this.logger.LogTrace($"Topic: {msg.Topic} Partition: {msg.Partition} Offset: {msg.Offset} \n{msg.Value}");
 
-                    // the message is processed
-                    var rlm = this.decoder.FromRawEvent(msg.Value, out bool didParse, out string parse_error_message);
+                    try
+                    {
+                        // the message is processed
+                        var rlm = this.decoder.FromRawEvent(msg.Value, out bool didParse, out string parse_error_message);
 
-                    if (!didParse)
-                    {
-                        this.logger.LogWarning(parse_error_message);
-                        // todo - add the errnous message to poison queue
-                    }
-                    else
-                    // filter if you want if (rlm.DeviceDate.ToLocalTime().Day == 18 && rlm.DeviceDate.ToLocalTime().Hour >= 13 && rlm.DeviceDate.ToLocalTime().Hour <= 18)
-                    {
-                        DecodeResult didDecode = new DecodeResult() { Success = false };
-                        try
+                        if (!didParse)
                         {
-                            didDecode = await this.decoder.DecodeAsync(rlm).ConfigureAwait(false);
-                        }
-                        catch
-                        {
-                            //burry
-                            logger.LogError($"Error decoding {rlm.ToFriendlyName()}");
-                        }
-                        if (!didDecode.Success)
-                        {
-                            this.logger.LogWarning(didDecode.ErrorMessage);
+                            this.logger.LogWarning(parse_error_message);
                             // todo - add the errnous message to poison queue
                         }
                         else
+                        // filter if you want if (rlm.DeviceDate.ToLocalTime().Day == 18 && rlm.DeviceDate.ToLocalTime().Hour >= 13 && rlm.DeviceDate.ToLocalTime().Hour <= 18)
                         {
-
-                            // this is just debug info - I should read this from database
+                            DecodeResult didDecode = new DecodeResult() { Success = false };
                             try
                             {
-                                await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
+                                didDecode = await this.decoder.DecodeAsync(rlm).ConfigureAwait(false);
                             }
                             catch
                             {
-                                //burry don't care much if a file won't get created
+                                //burry
+                                logger.LogError($"Error decoding {rlm.ToFriendlyName()}");
                             }
-                            // end debug info
+                            if (!didDecode.Success)
+                            {
+                                this.logger.LogWarning(didDecode.ErrorMessage);
+                                // todo - add the errnous message to poison queue
+                            }
+                            else
+                            {
 
-                            // create on demand this service to insure I get a transient db context
-                            await this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);
+                                // this is just debug info - I should read this from database
+                                try
+                                {
+                                    await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
+                                }
+                                catch
+                                {
+                                    //burry don't care much if a file won't get created
+                                }
+                                // end debug info
+
+                                // create on demand this service to insure I get a transient db context
+                                await this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);
+                            }
                         }
-                    }
 
-                    // move on
-                    await consumer.CommitAsync(msg).ConfigureAwait(false);
+                        // move on
+                        await consumer.CommitAsync(msg).ConfigureAwait(false);
+                    }
+                    // these are the exceptions that are blocking the queue
+                    catch (Exception ex)
+                    {
+                        this.logger.LogCritical($"Deque from Kafka stopped due to:{ex.Message}");
+                    }
                 };
 
                 Console.WriteLine("Incomming mesage are to be displayed here:");
