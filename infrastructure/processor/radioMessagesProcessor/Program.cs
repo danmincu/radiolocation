@@ -31,6 +31,8 @@ namespace RadioMessagesProcessor
             
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            //todo - here we need a connection pool otherwise hundreeds of possible connections are jamming the database
             services.AddDbContext<DataContext>(
                     options => options.UseMySql(connectionString,
                         mysqlOptions =>

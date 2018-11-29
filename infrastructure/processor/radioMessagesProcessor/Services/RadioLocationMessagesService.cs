@@ -27,8 +27,15 @@ namespace RadioMessagesProcessor.Services
 
         public async Task<int> InsertAsync(RadioLocationMessage radioLocationMessage)
         {
-            await _context.RadioLocationMessages.AddAsync(radioLocationMessage).ConfigureAwait(false);
-            return await _context.SaveChangesAsync().ConfigureAwait(false);
+            try
+            {
+                await _context.RadioLocationMessages.AddAsync(radioLocationMessage).ConfigureAwait(false);
+                return await _context.SaveChangesAsync().ConfigureAwait(false);
+            }
+            catch(Exception ex)
+            {
+                throw ex;
+            }
 
         }
 

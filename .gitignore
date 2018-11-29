@@ -10,3 +10,6 @@ infrastructure/processor/radioMessagesProcessor/.vs/
 .vs/
 infrastructure/processor/radioMessagesProcessorTest/bin/
 infrastructure/processor/radioMessagesProcessorTest/obj/
+/infrastructure/processor/mapping/obj
+/infrastructure/processor/Mapping.zip
+/infrastructure/processor/mapping/bin

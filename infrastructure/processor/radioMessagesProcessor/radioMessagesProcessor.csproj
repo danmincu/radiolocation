@@ -23,4 +23,7 @@
   <ItemGroup>
     <Folder Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\mapping\Mapping.csproj" />
+  </ItemGroup>
 </Project>

@@ -89,13 +89,19 @@ namespace radioMessagesProcessor.Services
                     }
                 }
 
-                var rssiRanges = new int[,] { { -60, 400 }, { -70, 800 }, { -80, 1600 }, { -90, 3200 }, { -100, 6400 }, { -110, 12800 }, { -120, 25600 } };
+                //var rssiRanges = new int[,] { { -60, 400 }, { -70, 800 }, { -80, 1600 }, { -90, 3200 }, { -100, 6400 }, { -110, 12800 }, { -120, 25600 } };
 
+                var radioIntersection = Mapping.Radio.RadioIntersection.GenerateRadioIntersection(
+                    radioLocation
+                    .Cells
+                    .Where(c => c.IsDecoded)
+                    .Select(c => new Mapping.Radio.RadioInfoGps(c.Radio, c.Rssi, c.Longitude, c.Latitude)).ToList());
+                var center = Mapping.Radio.RadioIntersection.CenterOfMass(radioIntersection.Intersection, radioIntersection.Level, radioIntersection.TranslationX, radioIntersection.TranslationY);
 
                 //todo - clip hexagons here and find the center of the mass of the intersection
                 radioLocation.Rssi = mainCell.Rssi;
-                radioLocation.DecodedLatitude = mainCell.Latitude;
-                radioLocation.DecodedLongitude = mainCell.Longitude;
+                radioLocation.DecodedLatitude = center.Latitude;
+                radioLocation.DecodedLongitude = center.Longitude;
                 radioLocation.DecodedDateUTC = DateTime.UtcNow;
 
                 return new DecodeResult
