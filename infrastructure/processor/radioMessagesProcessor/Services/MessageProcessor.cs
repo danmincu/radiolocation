@@ -38,6 +38,8 @@ namespace radioMessagesProcessor.Services
             this.logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MessageProcessor>();
         }
 
+        private int total_count = 0;
+
         public void Run()
         {
             using (var consumer = new Consumer<Null, string>(this.appSettings.KafkaConsumer, null, new StringDeserializer(Encoding.UTF8)))
@@ -92,7 +94,7 @@ namespace radioMessagesProcessor.Services
                                 // this is just debug info - I should read this from database
                                 try
                                 {
-                                    await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
+                                    //await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
                                 }
                                 catch
                                 {
@@ -101,7 +103,18 @@ namespace radioMessagesProcessor.Services
                                 // end debug info
 
                                 // create on demand this service to insure I get a transient db context
-                                await this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);
+
+                                using (var serviceScope = serviceProvider.CreateScope())
+                                {
+                                    total_count++;
+                                    logger.LogCritical($"Total count: {total_count}");
+                                    await new RadioLocationMessagesService(
+                                        serviceScope.ServiceProvider.GetService<DataContext>())
+                                        .InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm))
+                                        .ConfigureAwait(false);
+                                    //this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);
+                                    total_count--;
+                                }
                             }
                         }
 
@@ -118,7 +131,8 @@ namespace radioMessagesProcessor.Services
                 Console.WriteLine("Incomming mesage are to be displayed here:");
                 while (true)
                 {
-                    consumer.Poll(10);
+                    System.Threading.Thread.Sleep(30);
+                    consumer.Poll(100);
                 }
             }
 
