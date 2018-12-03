@@ -56,7 +56,7 @@ namespace radioMessagesProcessor.Services
                     !(c.Mnc == "-1") &&
                     !(c.Lac == "-1") &&
                     !(c.Cid == "-1"));
-            if (mainCell == null)
+            if (mainCell == null || mainCell.Mcc == "0" || mainCell.Mnc == "0")
             {
                 return new DecodeResult
                 {

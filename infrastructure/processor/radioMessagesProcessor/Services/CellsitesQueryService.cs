@@ -76,30 +76,51 @@ namespace radioMessagesProcessor.Services
 
         public async Task<CellSiteSolr> GetCellSiteAsync(CellInfoDto ci)
         {
-            var querySolTask = this.client.GetStringAsync($"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
-                $"/select?fq=area:{ci.Lac}&fq=cell:{ci.Cid}&fq=mcc:{ci.Mcc}&fq=net:{ci.Mnc}&fq=radio:{this.ToSolrRadio(ci.Radio)}&q=*:*");
+            var queryText = $"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
+                $"/select?fq=area:{ci.Lac}&fq=cell:{ci.Cid}&fq=mcc:{ci.Mcc}&fq=net:{ci.Mnc}&fq=radio:{this.ToSolrRadio(ci.Radio)}&q=*:*";
             if (string.IsNullOrEmpty(ci.Radio))
-                querySolTask = this.client.GetStringAsync($"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
-                    $"/select?fq=area:{ci.Lac}&fq=cell:{ci.Cid}&fq=mcc:{ci.Mcc}&fq=net:{ci.Mnc}&q=*:*");
+            {
+                queryText = $"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
+                    $"/select?fq=area:{ci.Lac}&fq=cell:{ci.Cid}&fq=mcc:{ci.Mcc}&fq=net:{ci.Mnc}&q=*:*";
+            }
 
-            var msg = await querySolTask.ConfigureAwait(false);
-            var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
-            return solrResponse.response.docs.FirstOrDefault();
+            var querySolTask = this.client.GetStringAsync(queryText);
+
+            try
+            {
+                var msg = await querySolTask.ConfigureAwait(false);
+                var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
+                return solrResponse.response.docs.FirstOrDefault();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Error getting cell site from Solr database. Query:{queryText}");
+                throw ex;
+            }
         }
 
         public async Task<IEnumerable<CellSiteSolr>> GetNeighboursAsync(double distance, CellInfoDto except)
         {
             var geofitRequest = $"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
             $"/select??&q=*:*&fq={{!geofilt%20sfield=location}}&pt={except.Latitude},{except.Longitude}&d={distance}&rows=800";
-            var querySolTask = this.client.GetStringAsync(geofitRequest);
-            var msg = await querySolTask.ConfigureAwait(false);
-            var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
-            return solrResponse.response.docs.Where(c => !(c.mcc.Equals(except.Mcc, StringComparison.OrdinalIgnoreCase) &&
-                    c.net.Equals(except.Mnc, StringComparison.OrdinalIgnoreCase) &&
-                    c.cell.Equals(except.Cid, StringComparison.OrdinalIgnoreCase) &&
-                    c.area.Equals(except.Lac, StringComparison.OrdinalIgnoreCase)) &&
-                    (c.unit == null || except.PscPci == null ||
-                    c.unit.Equals(except.PscPci, StringComparison.OrdinalIgnoreCase)));
+            try
+            {
+                var querySolTask = this.client.GetStringAsync(geofitRequest);
+                var msg = await querySolTask.ConfigureAwait(false);
+                var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
+                return solrResponse.response.docs.Where(c => !(c.mcc.Equals(except.Mcc, StringComparison.OrdinalIgnoreCase) &&
+                        c.net.Equals(except.Mnc, StringComparison.OrdinalIgnoreCase) &&
+                        c.cell.Equals(except.Cid, StringComparison.OrdinalIgnoreCase) &&
+                        c.area.Equals(except.Lac, StringComparison.OrdinalIgnoreCase)) &&
+                        (c.unit == null || except.PscPci == null ||
+                        c.unit.Equals(except.PscPci, StringComparison.OrdinalIgnoreCase)));
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Error getting cell site neighbours from Solr database. Query:{geofitRequest}");
+                throw ex;
+            }
+
         }
 
         public async Task<IEnumerable<CellSiteSolr>> GetNeighboursForUnitsAsync(double distance, CellInfoDto except, IEnumerable<string> units)
@@ -112,16 +133,24 @@ namespace radioMessagesProcessor.Services
             var unitsQuery = string.Join("%20OR%20", units.Select(u => $"unit:{u}"));
             var geofitRequest = $"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
             $"/select??&q=*:*&fq={unitsQuery}&fq={{!geofilt%20sfield=location}}&pt={except.Latitude},{except.Longitude}&d={distance}&rows=800";
-            var querySolTask = this.client.GetStringAsync(geofitRequest);
-            var msg = await querySolTask.ConfigureAwait(false);
-            var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
-            return solrResponse.response.docs.Where(c => !(c.mcc.Equals(except.Mcc, StringComparison.OrdinalIgnoreCase) &&
-                    c.net.Equals(except.Mnc, StringComparison.OrdinalIgnoreCase) &&
-                    c.cell.Equals(except.Cid, StringComparison.OrdinalIgnoreCase) &&
-                    c.area.Equals(except.Lac, StringComparison.OrdinalIgnoreCase) &&
-                    (c.unit == null || except.PscPci == null ||
-                    c.unit.Equals(except.PscPci, StringComparison.OrdinalIgnoreCase))));
 
+            try
+            {
+                var querySolTask = this.client.GetStringAsync(geofitRequest);
+                var msg = await querySolTask.ConfigureAwait(false);
+                var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
+                return solrResponse.response.docs.Where(c => !(c.mcc.Equals(except.Mcc, StringComparison.OrdinalIgnoreCase) &&
+                        c.net.Equals(except.Mnc, StringComparison.OrdinalIgnoreCase) &&
+                        c.cell.Equals(except.Cid, StringComparison.OrdinalIgnoreCase) &&
+                        c.area.Equals(except.Lac, StringComparison.OrdinalIgnoreCase) &&
+                        (c.unit == null || except.PscPci == null ||
+                        c.unit.Equals(except.PscPci, StringComparison.OrdinalIgnoreCase))));
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Error getting cell site neighbours for units from Solr database. Query:{geofitRequest}");
+                throw ex;
+            }
 
         }
 
@@ -129,13 +158,21 @@ namespace radioMessagesProcessor.Services
         {
             var geofitRequest = $"http://{this.appSettings.SolrCellSitesServer}/solr/{this.appSettings.SolrCellSitesServerCore}" +
                 $"/select??&q=*:*&fq={{!geofilt%20sfield=location}}&pt={latitude},{longitude}&d={distance}&rows=500";
-            var querySolTask = this.client.GetStringAsync(geofitRequest);
-            var msg = await querySolTask.ConfigureAwait(false);
-            var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
-            return solrResponse.response.docs.Where(c => !(c.mcc.Equals(except.Mcc, StringComparison.OrdinalIgnoreCase) &&
-                    c.net.Equals(except.Mnc, StringComparison.OrdinalIgnoreCase) &&
-                    c.cell.Equals(except.Cid, StringComparison.OrdinalIgnoreCase) &&
-                    c.area.Equals(except.Lac, StringComparison.OrdinalIgnoreCase)));
+            try
+            {
+                var querySolTask = this.client.GetStringAsync(geofitRequest);
+                var msg = await querySolTask.ConfigureAwait(false);
+                var solrResponse = JsonConvert.DeserializeObject<CellSitesQuery>(msg);
+                return solrResponse.response.docs.Where(c => !(c.mcc.Equals(except.Mcc, StringComparison.OrdinalIgnoreCase) &&
+                        c.net.Equals(except.Mnc, StringComparison.OrdinalIgnoreCase) &&
+                        c.cell.Equals(except.Cid, StringComparison.OrdinalIgnoreCase) &&
+                        c.area.Equals(except.Lac, StringComparison.OrdinalIgnoreCase)));
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogError($"Error getting cell site neighbours for units from Solr database. Query:{geofitRequest}");
+                throw ex;
+            }
         }
 
         public CellSiteSolr ResolveCell(CellInfoDto cell, CellInfoDto mainCell, IEnumerable<CellSiteSolr> neighbours)
@@ -180,12 +217,12 @@ namespace radioMessagesProcessor.Services
                 return steps.FirstOrDefault(s => s.Item1 < lowerDistanceRange)?.Item2 ?? steps.First().Item2;
             }
             else
-              return orderedMatchingPscCells.FirstOrDefault();
+                return orderedMatchingPscCells.FirstOrDefault();
         }
 
         private int DistanceSteps(CellSiteSolr solrCell, CellInfoDto cell2, int distanceStepMeters = 300)
         {
-            return (int) Math.Truncate((Mapping
+            return (int)Math.Truncate((Mapping
                 .CoordinateTransformations
                 .Distance(new Mapping.Mapping.Coordinate(double.Parse(solrCell.lat), double.Parse(solrCell.lon)),
                   new Mapping.Mapping.Coordinate(cell2.Latitude, cell2.Longitude)) * 1000) / distanceStepMeters);

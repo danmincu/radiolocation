@@ -58,8 +58,6 @@ namespace radioMessagesProcessor.Services
 
         }
 
-        private int total_count = 0;
-
         public void Run()
         {
             using (var consumer = new Consumer<Null, string>(this.appSettings.KafkaConsumer, null, new StringDeserializer(Encoding.UTF8)))
@@ -98,10 +96,10 @@ namespace radioMessagesProcessor.Services
                             {
                                 didDecode = await this.decoder.DecodeAsync(rlm).ConfigureAwait(false);
                             }
-                            catch
+                            catch(Exception ex)
                             {
                                 //burry
-                                logger.LogError($"Error decoding {rlm.ToFriendlyName()}");
+                                 logger.LogError($"Error decoding {rlm.ToFriendlyName()} Exception: {ex}");
                             }
                             if (!didDecode.Success)
                             {
@@ -126,9 +124,6 @@ namespace radioMessagesProcessor.Services
 
                                 using (var serviceScope = serviceProvider.CreateScope())
                                 {
-                                    total_count++;
-                                    logger.LogCritical($"Total count: {total_count}");
-
                                     var m = rlm.RadioShapes == null ? null : ZipUnzip.Zip(JsonConvert.SerializeObject(rlm.RadioShapes));
 
                                     var v = this.mapper.Map<RadioLocationMessage>(rlm);
@@ -138,7 +133,6 @@ namespace radioMessagesProcessor.Services
                                         .InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm))
                                         .ConfigureAwait(false);
                                     //this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);
-                                    total_count--;
                                 }
                             }
                         }
