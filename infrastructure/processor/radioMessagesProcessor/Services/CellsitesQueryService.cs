@@ -94,7 +94,7 @@ namespace radioMessagesProcessor.Services
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Error getting cell site from Solr database. Query:{queryText}");
+                this.logger.LogError($"Error getting cell site from Solr database. Query:{queryText}/nException:{ex}");
                 throw ex;
             }
         }
@@ -117,7 +117,7 @@ namespace radioMessagesProcessor.Services
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Error getting cell site neighbours from Solr database. Query:{geofitRequest}");
+                this.logger.LogError($"Error getting cell site neighbours from Solr database. Query:{geofitRequest}/nException:{ex}");
                 throw ex;
             }
 
@@ -148,7 +148,7 @@ namespace radioMessagesProcessor.Services
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Error getting cell site neighbours for units from Solr database. Query:{geofitRequest}");
+                this.logger.LogError($"Error getting cell site neighbours for units from Solr database. Query:{geofitRequest}/nException:{ex}");
                 throw ex;
             }
 
@@ -170,7 +170,7 @@ namespace radioMessagesProcessor.Services
             }
             catch (Exception ex)
             {
-                this.logger.LogError($"Error getting cell site neighbours for units from Solr database. Query:{geofitRequest}");
+                this.logger.LogError($"Error getting cell site neighbours for units from Solr database. Query:{geofitRequest}/nException:{ex}");
                 throw ex;
             }
         }
