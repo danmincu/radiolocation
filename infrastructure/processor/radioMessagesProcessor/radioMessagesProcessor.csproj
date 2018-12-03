@@ -21,6 +21,7 @@
      <PackageReference Include="StructureMap.Microsoft.DependencyInjection" Version="1.4.0" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Migrations\" />
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>

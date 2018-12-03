@@ -20,6 +20,11 @@ namespace radioMessagesProcessor.Helpers
 
         public static byte[] Zip(string str)
         {
+            if (string.IsNullOrEmpty(str))
+            {
+                return new byte[] { };
+            }
+
             var bytes = Encoding.UTF8.GetBytes(str);
 
             using (var msi = new MemoryStream(bytes))

@@ -19,6 +19,13 @@ namespace RadioMessagesProcessor.Entities
         /// </summary>
         public byte[] DecodedEvent { get; set; }
 
+
+        /// <summary>
+        /// Contains a serialized and compressed list of the decoded 
+        /// <see cref="Mapping.Radio.RadioIntersection.RadioIntersectionResponse"/>
+        /// </summary>
+        public byte[] RadioShapes { get; set; }
+
         public System.DateTime DecodedDateUTC { get; set; }
 
         public double GpsLatitude { get; set; }

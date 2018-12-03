@@ -58,39 +58,10 @@ namespace Mapping.Radio
         /// <returns></returns>
         private static Polygons CellCoverage(RadioInfo ri, int pixelsPerKilometer)
         {
-            var rssiRanges = ri.Radio.Equals("lte", StringComparison.OrdinalIgnoreCase) ?
-                   new int[][] {
-                       new[] { -60, 150, 400 },
-                       new[] { -70, 300, 400 },
-                       new[] { -80, 600, 400 },
-                       new[] { -90, 1200, 800 },
-                       new[] { -100, 2400, 1200 },
-                       new[] { -110, 4800, 2000 },
-                       new[] { -120, 9600, 3000 } } :
-
-                   new int[][] {
-                        new[] { -60, 200, 200 },
-                        new[] { -70, 600, 300 },
-                        new[] { -80, 800, 400 },
-                        new[] { -90, 1000, 400 },
-                        new[] { -100, 1300, 500 },
-                        new[] { -106, 1430, 500 },
-                        new[] { -107, 1800, 500 }, // << 
-                        new[] { -108, 2450, 600 },
-                        new[] { -109, 3000, 600 }, // <<
-                        new[] { -110, 3500, 700 },
-                        new[] { -111, 4000, 800 }, // <<
-                        new[] { -112, 4850, 1000 },
-                        new[] { -113, 6000, 1500 },
-                        new[] { -114, 10000, 4000 },
-                        new[] { -120, 25600, 5000 }
-
-                   };
-
             var innerRange = 0;
-            var outerRange = rssiRanges.Last()[1];
+            var outerRange = RssiRanges.Ranges(ri.Radio).Last()[1];
 
-            foreach (var item in rssiRanges)
+            foreach (var item in RssiRanges.Ranges(ri.Radio))
             {
                 if (ri.Rssi <= item[0])
                 {

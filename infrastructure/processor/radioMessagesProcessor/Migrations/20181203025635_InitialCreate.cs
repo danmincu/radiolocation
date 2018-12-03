@@ -17,6 +17,7 @@ namespace radioMessagesProcessor.Migrations
                     DeviceDate = table.Column<DateTime>(nullable: false),
                     RawEvent = table.Column<byte[]>(nullable: true),
                     DecodedEvent = table.Column<byte[]>(nullable: true),
+                    RadioShapes = table.Column<byte[]>(nullable: true),
                     DecodedDateUTC = table.Column<DateTime>(nullable: false),
                     GpsLatitude = table.Column<double>(nullable: false),
                     GpsLongitude = table.Column<double>(nullable: false),

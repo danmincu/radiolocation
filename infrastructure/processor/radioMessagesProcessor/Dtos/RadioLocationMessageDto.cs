@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using Mapping.Radio;
 
 namespace RadioMessagesProcessor.Dtos
 {
@@ -37,9 +38,14 @@ namespace RadioMessagesProcessor.Dtos
 
         public System.DateTime DeviceDate { get; set; }
 
-        public byte[] RawEvent { get; set; }
+        public string RawEventString { get; set; }
 
         public System.DateTime DecodedDateUTC { get; set; }
+
+        public RadioIntersection.RadioIntersectionResponse RadioShapes
+        {
+            get; set;
+        }
 
         public double GpsLatitude { get; set; }
 

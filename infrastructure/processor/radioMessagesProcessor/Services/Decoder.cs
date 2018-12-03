@@ -77,10 +77,15 @@ namespace radioMessagesProcessor.Services
                 //at least one cell has PscPci so we should get the geographical neighbours
                 if (radioLocation.CellsExcept(mainCell).Any(c => !string.IsNullOrEmpty(c.PscPci)))
                 {
-                    var neighbours = await this.cellsitesQueryService.GetNeighboursAsync(5, mainCell).ConfigureAwait(false);
-                    foreach (var cell in radioLocation.CellsExcept(mainCell).Where(c => !string.IsNullOrEmpty(c.PscPci)))
+                    //var neighbours = await this.cellsitesQueryService.GetNeighboursAsync(5, mainCell).ConfigureAwait(false);
+                    var cellsWithPscPciExceptMainCell = radioLocation.CellsExcept(mainCell).Where(c => !string.IsNullOrEmpty(c.PscPci));
+                    var neighbours = await this.cellsitesQueryService
+                        .GetNeighboursForUnitsAsync(35, mainCell, cellsWithPscPciExceptMainCell.Select(c => c.PscPci))
+                        .ConfigureAwait(false);
+
+                    foreach (var cell in cellsWithPscPciExceptMainCell)
                     {
-                        var identifyCell = this.cellsitesQueryService.MatchCell(cell, mainCell, neighbours.ToList());
+                        var identifyCell = this.cellsitesQueryService.ResolveCell(cell, mainCell, neighbours.ToList());
                         if (identifyCell != null)
                         {
                             Populate(identifyCell, cell);
@@ -89,20 +94,24 @@ namespace radioMessagesProcessor.Services
                     }
                 }
 
-                //var rssiRanges = new int[,] { { -60, 400 }, { -70, 800 }, { -80, 1600 }, { -90, 3200 }, { -100, 6400 }, { -110, 12800 }, { -120, 25600 } };
-
                 var radioIntersection = Mapping.Radio.RadioIntersection.GenerateRadioIntersection(
                     radioLocation
                     .Cells
                     .Where(c => c.IsDecoded)
                     .Select(c => new Mapping.Radio.RadioInfoGps(c.Radio, c.Rssi, c.Longitude, c.Latitude)).ToList());
-                var center = Mapping.Radio.RadioIntersection.CenterOfMass(radioIntersection.Intersection, radioIntersection.Level, radioIntersection.TranslationX, radioIntersection.TranslationY);
 
-                //todo - clip hexagons here and find the center of the mass of the intersection
+                var center = Mapping.Radio.RadioIntersection.CenterOfMass(
+                        radioIntersection.Intersection,
+                        radioIntersection.Level,
+                        radioIntersection.TranslationX,
+                        radioIntersection.TranslationY);
+
                 radioLocation.Rssi = mainCell.Rssi;
                 radioLocation.DecodedLatitude = center.Latitude;
                 radioLocation.DecodedLongitude = center.Longitude;
                 radioLocation.DecodedDateUTC = DateTime.UtcNow;
+
+                radioLocation.RadioShapes = radioIntersection;
 
                 return new DecodeResult
                 {
@@ -150,9 +159,11 @@ namespace radioMessagesProcessor.Services
                 return null;
             }
 
-            var result = new RadioLocationMessageDto();
-            result.CollectionDateUTC = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lines[1])).DateTime;
-
+            var result = new RadioLocationMessageDto()
+            {
+                RawEventString = rawEvent,
+                CollectionDateUTC = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lines[1])).DateTime
+            };
 
             if (!lines[2].Equals("#deviceId,deviceTime"))
             {
@@ -246,7 +257,6 @@ namespace radioMessagesProcessor.Services
 
             isSuccessful = true;
             error_message = "";
-            result.RawEvent = ZipUnzip.Zip(rawEvent);            
             return result;
         }
     }

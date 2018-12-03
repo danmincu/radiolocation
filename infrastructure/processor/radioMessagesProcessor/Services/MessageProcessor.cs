@@ -10,6 +10,9 @@ using System.Text;
 using AutoMapper;
 using RadioMessagesProcessor.Entities;
 using RadioMessagesProcessor.Dtos;
+using System.Linq;
+using radioMessagesProcessor.Helpers;
+using Newtonsoft.Json;
 
 namespace radioMessagesProcessor.Services
 {
@@ -36,6 +39,23 @@ namespace radioMessagesProcessor.Services
             this.serviceProvider = serviceProvider;
             this.decoder = decoder;
             this.logger = serviceProvider.GetService<ILoggerFactory>().CreateLogger<MessageProcessor>();
+
+            //using (var serviceScope = serviceProvider.CreateScope())
+            //{
+            //    var message = new RadioLocationMessagesService(
+            //        serviceScope.ServiceProvider.GetService<DataContext>())
+            //        .GetById(id: Guid.Parse("a1a2c401-6494-4a2d-b35c-a3b4bed44c61"));
+            //    var mdto = mapper.Map<RadioLocationMessageDto>(message);
+            //    var m = mdto.RawEventString;
+            //    var didDecode = this.decoder.DecodeAsync(mdto).Result;
+            //    var radioIntersection = Mapping.Radio.RadioIntersection.GenerateRadioIntersection(
+            //        mdto
+            //        .Cells
+            //        .Where(c => c.IsDecoded)
+            //        .Select(c => new Mapping.Radio.RadioInfoGps(c.Radio, c.Rssi, c.Longitude, c.Latitude)).ToList());
+            //    var ri = radioIntersection;
+            //}
+
         }
 
         private int total_count = 0;
@@ -94,7 +114,7 @@ namespace radioMessagesProcessor.Services
                                 // this is just debug info - I should read this from database
                                 try
                                 {
-                                    //await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
+                                    await GoogleEarthPlacesCreator.ToPlaceFile(rlm);
                                 }
                                 catch
                                 {
@@ -108,6 +128,11 @@ namespace radioMessagesProcessor.Services
                                 {
                                     total_count++;
                                     logger.LogCritical($"Total count: {total_count}");
+
+                                    var m = rlm.RadioShapes == null ? null : ZipUnzip.Zip(JsonConvert.SerializeObject(rlm.RadioShapes));
+
+                                    var v = this.mapper.Map<RadioLocationMessage>(rlm);
+
                                     await new RadioLocationMessagesService(
                                         serviceScope.ServiceProvider.GetService<DataContext>())
                                         .InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm))

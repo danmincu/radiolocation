@@ -9,7 +9,7 @@ using RadioMessagesProcessor.Helpers;
 namespace radioMessagesProcessor.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20181124035705_InitialCreate")]
+    [Migration("20181203025635_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -49,6 +49,8 @@ namespace radioMessagesProcessor.Migrations
                     b.Property<double>("GpsSpeed");
 
                     b.Property<string>("Imei");
+
+                    b.Property<byte[]>("RadioShapes");
 
                     b.Property<byte[]>("RawEvent");
 

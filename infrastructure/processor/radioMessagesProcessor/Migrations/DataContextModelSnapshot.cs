@@ -48,6 +48,8 @@ namespace radioMessagesProcessor.Migrations
 
                     b.Property<string>("Imei");
 
+                    b.Property<byte[]>("RadioShapes");
+
                     b.Property<byte[]>("RawEvent");
 
                     b.Property<int>("Rssi");

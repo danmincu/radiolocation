@@ -18,6 +18,7 @@ test if a port is opened
 
 #reset-offsets in Kafka
 
+cd /opt/kafka/bin/
 sh kafka-consumer-groups.sh --bootstrap-server localhost:9092 --group sample-consumer --topic incomming_radio_messages --reset-offsets --to-earliest --execute
  
  
