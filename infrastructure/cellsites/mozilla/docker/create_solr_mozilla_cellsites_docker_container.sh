@@ -47,6 +47,9 @@ echo "upload the custom schema and solr config to the $SOLR_CORE in the $SOLR_CO
 docker cp ./solr/solrconfig.xml $SOLR_CONTAINER:/opt/solr/server/solr/$SOLR_CORE/conf/solrconfig.xml
 docker cp ./solr/managed-schema $SOLR_CONTAINER:/opt/solr/server/solr/$SOLR_CORE/conf/managed-schema
 
+#this is not tested in this context. it needs restart as in increases Solr heap size
+docker cp ./solr.in.sh $SOLR_CONTAINER:/opt/solr/bin/solr.in.sh
+
 echo "reload the core $SOLR_CORE in the $SOLR_CONTAINER using the $SOLR_PORT"
 curl "http://localhost:$SOLR_PORT/solr/admin/cores?action=RELOAD&core=$SOLR_CORE"
 
