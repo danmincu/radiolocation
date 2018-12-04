@@ -44,7 +44,7 @@ namespace radioMessagesProcessor.Services
             //{
             //    var message = new RadioLocationMessagesService(
             //        serviceScope.ServiceProvider.GetService<DataContext>())
-            //        .GetById(id: Guid.Parse("a1a2c401-6494-4a2d-b35c-a3b4bed44c61"));
+            //        .GetById(id: Guid.Parse("b85e2989-411c-41eb-ae7a-2a87d1ef1d5a"));
             //    var mdto = mapper.Map<RadioLocationMessageDto>(message);
             //    var m = mdto.RawEventString;
             //    var didDecode = this.decoder.DecodeAsync(mdto).Result;
