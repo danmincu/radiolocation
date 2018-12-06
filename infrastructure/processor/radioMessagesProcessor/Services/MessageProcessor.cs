@@ -8,9 +8,10 @@ using RadioMessagesProcessor.Services;
 using System;
 using System.Text;
 using AutoMapper;
-using RadioMessagesProcessor.Entities;
-using radioMessagesProcessor.Helpers;
+using LocationData.Entities;
+using LocationData.Helpers;
 using Newtonsoft.Json;
+using LocationData;
 
 namespace radioMessagesProcessor.Services
 {
@@ -127,7 +128,7 @@ namespace radioMessagesProcessor.Services
                                     var v = this.mapper.Map<RadioLocationMessage>(rlm);
 
                                     await new RadioLocationMessagesService(
-                                        serviceScope.ServiceProvider.GetService<DataContext>())
+                                        serviceScope.ServiceProvider.GetService<LocationDataContext>())
                                         .InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm))
                                         .ConfigureAwait(false);
                                     //this.serviceProvider.GetService<IRadioLocationMessagesService>().InsertAsync(this.mapper.Map<RadioLocationMessage>(rlm)).ConfigureAwait(false);

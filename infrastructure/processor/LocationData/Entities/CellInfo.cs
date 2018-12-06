@@ -1,4 +1,4 @@
-﻿namespace RadioMessagesProcessor.Entities
+﻿namespace LocationData.Entities
 {
     public class CellInfo
     {

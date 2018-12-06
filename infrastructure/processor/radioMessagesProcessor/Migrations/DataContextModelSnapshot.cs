@@ -3,11 +3,10 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using RadioMessagesProcessor.Helpers;
 
 namespace radioMessagesProcessor.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(LocationData.LocationDataContext))]
     partial class DataContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
@@ -17,7 +16,7 @@ namespace radioMessagesProcessor.Migrations
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("RadioMessagesProcessor.Entities.RadioLocationMessage", b =>
+            modelBuilder.Entity("LocationData.Entities.RadioLocationMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();

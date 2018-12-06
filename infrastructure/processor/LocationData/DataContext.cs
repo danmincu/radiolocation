@@ -1,27 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using RadioMessagesProcessor.Entities;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+using LocationData.Entities;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using RadioMessagesProcessor.Helpers;
-using RadioMessagesProcessor.Services;
-using AutoMapper;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
-using Pomelo.EntityFrameworkCore.MySql;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
 using System;
 using Microsoft.EntityFrameworkCore.Design;
 using System.IO;
 
-namespace RadioMessagesProcessor.Helpers
+namespace LocationData
 {
 
     // command for options creation:
@@ -29,20 +14,20 @@ namespace RadioMessagesProcessor.Helpers
 
     // command for migration creation:
     // dotnet ef migrations add InitialCreate
-    
+
     // command for applying the migration to the db:
     // dotnet ef database update
 
-    public class DbContextFactory : IDesignTimeDbContextFactory<DataContext>
+    public class DbContextFactory : IDesignTimeDbContextFactory<LocationDataContext>
     {
-        public DataContext CreateDbContext(string[] args)
+        public LocationDataContext CreateDbContext(string[] args)
         {
             var configuration = new ConfigurationBuilder()
            .SetBasePath(Directory.GetCurrentDirectory())
            .AddJsonFile("appsettings.json", true)
            .Build();
 
-            var optionsBuilder = new DbContextOptionsBuilder<DataContext>();
+            var optionsBuilder = new DbContextOptionsBuilder<LocationDataContext>();
 
             optionsBuilder.UseMySql(configuration.GetConnectionString("DefaultConnection"),
                             mysqlOptions =>
@@ -52,13 +37,13 @@ namespace RadioMessagesProcessor.Helpers
                                 mysqlOptions.EnableRetryOnFailure(3, TimeSpan.FromSeconds(1), null);
                             });
 
-            return new DataContext(optionsBuilder.Options);
+            return new LocationDataContext(optionsBuilder.Options);
         }
     }
 
-    public class DataContext : DbContext
+    public class LocationDataContext : DbContext
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
+        public LocationDataContext(DbContextOptions<LocationDataContext> options) : base(options) { }
 
         public DbSet<RadioLocationMessage> RadioLocationMessages { get; set; }
    

@@ -8,7 +8,7 @@ using RadioMessagesProcessor.Helpers;
 
 namespace radioMessagesProcessor.Migrations
 {
-    [DbContext(typeof(DataContext))]
+    [DbContext(typeof(LocationData.LocationDataContext))]
     [Migration("20181203025635_InitialCreate")]
     partial class InitialCreate
     {
@@ -19,7 +19,7 @@ namespace radioMessagesProcessor.Migrations
                 .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
-            modelBuilder.Entity("RadioMessagesProcessor.Entities.RadioLocationMessage", b =>
+            modelBuilder.Entity("LocationData.Entities.RadioLocationMessage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace RadioMessagesProcessor.Dtos
+namespace LocationData.Dtos
 {
     public class RadioCellInfoDto
     {

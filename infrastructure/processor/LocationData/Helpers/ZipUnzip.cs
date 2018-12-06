@@ -2,7 +2,7 @@
 using System.IO.Compression;
 using System.Text;
 
-namespace radioMessagesProcessor.Helpers
+namespace LocationData.Helpers
 {
     public static class ZipUnzip
     {

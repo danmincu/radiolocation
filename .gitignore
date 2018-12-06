@@ -13,3 +13,5 @@ infrastructure/processor/radioMessagesProcessorTest/obj/
 /infrastructure/processor/mapping/obj
 /infrastructure/processor/Mapping.zip
 /infrastructure/processor/mapping/bin
+/infrastructure/processor/LocationData/obj
+/infrastructure/processor/LocationData/bin/Debug/netcoreapp2.1

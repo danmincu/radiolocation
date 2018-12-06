@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using radioMessagesProcessor.Helpers;
-using RadioMessagesProcessor.Dtos;
+using LocationData.Dtos;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace radioMessagesProcessor.Services

@@ -7,6 +7,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "radioMessagesProcessor", "r
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mapping", "mapping\Mapping.csproj", "{B0E6E3BE-DE23-43B0-B653-8AB393648B67}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "readTrackingApi", "readTrackingApi\readTrackingApi.csproj", "{A7F24085-2A67-482F-96BE-EB886B998007}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LocationData", "LocationData\LocationData.csproj", "{AEC3A459-7343-4AF2-8ECD-F54FAFD8314D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +25,14 @@ Global
 		{B0E6E3BE-DE23-43B0-B653-8AB393648B67}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0E6E3BE-DE23-43B0-B653-8AB393648B67}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0E6E3BE-DE23-43B0-B653-8AB393648B67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A7F24085-2A67-482F-96BE-EB886B998007}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7F24085-2A67-482F-96BE-EB886B998007}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7F24085-2A67-482F-96BE-EB886B998007}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7F24085-2A67-482F-96BE-EB886B998007}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEC3A459-7343-4AF2-8ECD-F54FAFD8314D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AEC3A459-7343-4AF2-8ECD-F54FAFD8314D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AEC3A459-7343-4AF2-8ECD-F54FAFD8314D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AEC3A459-7343-4AF2-8ECD-F54FAFD8314D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

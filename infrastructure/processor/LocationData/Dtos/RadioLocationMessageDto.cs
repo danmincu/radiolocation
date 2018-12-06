@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Mapping.Radio;
 
-namespace RadioMessagesProcessor.Dtos
+namespace LocationData.Dtos
 {
     public class RadioLocationMessageDto
     {

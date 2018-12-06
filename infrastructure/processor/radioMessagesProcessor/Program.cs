@@ -9,9 +9,8 @@ using radioMessagesProcessor.Services;
 using RadioMessagesProcessor.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Pomelo.EntityFrameworkCore.MySql.Infrastructure;
-using Microsoft.EntityFrameworkCore.Design;
 using RadioMessagesProcessor.Services;
-using System.Threading.Tasks;
+using LocationData;
 
 namespace RadioMessagesProcessor
 {
@@ -61,7 +60,7 @@ namespace RadioMessagesProcessor
 
             var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContextPool<DataContext>(
+            services.AddDbContextPool<LocationDataContext>(
                     options => options.UseMySql(connectionString,
                         mysqlOptions =>
                         {

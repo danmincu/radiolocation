@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using RadioMessagesProcessor.Dtos;
 using RadioMessagesProcessor.Helpers;
 using System;
 using System.Collections.Generic;
@@ -10,6 +9,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using LocationData.Dtos;
 
 namespace radioMessagesProcessor.Services
 {

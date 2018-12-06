@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace RadioMessagesProcessor.Entities
+namespace LocationData.Entities
 {
     public class RadioLocationMessage
     {

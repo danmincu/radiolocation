@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RadioMessagesProcessor.Entities;
-using RadioMessagesProcessor.Helpers;
+using LocationData;
+using LocationData.Entities;
 
 namespace RadioMessagesProcessor.Services
 {
@@ -18,9 +18,9 @@ namespace RadioMessagesProcessor.Services
 
     public class RadioLocationMessagesService : IRadioLocationMessagesService
     {
-        private DataContext _context;
+        private LocationDataContext _context;
 
-        public RadioLocationMessagesService(DataContext context)
+        public RadioLocationMessagesService(LocationDataContext context)
         {
             _context = context;
         }
