@@ -9,8 +9,6 @@ using System;
 using System.Text;
 using AutoMapper;
 using RadioMessagesProcessor.Entities;
-using RadioMessagesProcessor.Dtos;
-using System.Linq;
 using radioMessagesProcessor.Helpers;
 using Newtonsoft.Json;
 
