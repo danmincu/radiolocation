@@ -2,3 +2,4 @@ installing the centos doesn't configure the network
 do this https://lintut.com/how-to-setup-network-after-rhelcentos-7-minimal-installation/
 
 run edit a connection than activate it.
+dont forget to do the Automatically connect checkbox.
