@@ -1,5 +1,13 @@
 installing the centos doesn't configure the network
 do this https://lintut.com/how-to-setup-network-after-rhelcentos-7-minimal-installation/
 
-run edit a connection than activate it.
+run `nmtui` edit a connection than activate it.
 dont forget to do the Automatically connect checkbox.
+
+
+
+force centos not to start the startx kde
+systemctl set-default multi-user.target
+
+to undo 
+systemctl set-default graphical.target
